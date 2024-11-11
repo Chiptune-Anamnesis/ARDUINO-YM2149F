@@ -224,18 +224,6 @@ int sampleCounter = 0;
 int sampleLength = 0;
 int timerTicks = 0;
 
-int prevPattern = -1;
-bool patternSwitch = false;
-
-void updateArpeggioPattern() {
-    // Reset arpeggio counter and add a small delay on pattern switch
-    if (patternSwitch) {
-        delay(5);  // Small delay to prevent overlap issues on pattern switch
-        arpeggioCounter = 0;
-        patternSwitch = false;
-    }
-}
-
 ISR(TIMER1_COMPA_vect)
 {
   timerTicks++;
@@ -312,14 +300,9 @@ if (vibratoCounter >= 360) vibratoCounter -= 360;  // Reset to prevent overflow
   {
         timerTicks = 0;
         setPinHigh(__LEDPORT__, __LED__);
-        
         if (controlValue7 <= 64) {arpMod = 1;} else {arpMod = 0;}
-        int index = (noteA + octaveOffset) + currentPattern[arpeggioCounter];
-        if (index >= 0 && index < sizeof(tp) / sizeof(tp[0])) {
-            periodA = tp[index];
-        } else {
-            periodA = 0;  // Set a default or safe period if index is out of bounds
-        }
+        periodA = tp[(noteA + octaveOffset) + currentPattern[arpeggioCounter]];
+        currentArpNote = (noteA + octaveOffset) + currentPattern[arpeggioCounter] ;
         byte LSB = (periodA & 0x00FF); // Get the LSB of the period
         byte MSB = ((periodA & 0x0F00) >> 8); // Get the MSB of the period
         send_data(0x00, LSB); // Send LSB to register 0x00
@@ -329,17 +312,13 @@ if (vibratoCounter >= 360) vibratoCounter -= 360;  // Reset to prevent overflow
         arpeggioCounter++;
         if (arpeggioCounter == arpeggioLength) arpeggioCounter = 0;
   }
-   if (timerTicks >= arpeggioSpeed && noteActiveB == 1 && controlValue5 >= 1)
+  else if (timerTicks >= arpeggioSpeed && noteActiveB == 1 && controlValue5 >= 1)
   {
         timerTicks = 0;
         setPinHigh(__LEDPORT__, __LED__);
         if (controlValue7 <= 64) {arpMod = 1;} else {arpMod = 0;}
-        int index = (noteB + octaveOffset) + currentPattern[arpeggioCounter];
-        if (index >= 0 && index < sizeof(tp) / sizeof(tp[0])) {
-            periodB = tp[index];
-        } else {
-            periodB = 0;  // Set a default or safe period if index is out of bounds
-        }
+        periodB = tp[(noteB + octaveOffset) + currentPattern[arpeggioCounter]];
+        currentArpNote = (noteB + octaveOffset) + currentPattern[arpeggioCounter] ;
         byte LSB = ( periodB & 0x00FF);
         byte MSB = ((periodB >> 8) & 0x000F);
         send_data(0x02, LSB);
@@ -349,17 +328,13 @@ if (vibratoCounter >= 360) vibratoCounter -= 360;  // Reset to prevent overflow
         arpeggioCounter++;
         if (arpeggioCounter == arpeggioLength) arpeggioCounter = 0;
   }
-     if (timerTicks >= arpeggioSpeed && noteActiveC == 1 && controlValue5 >= 1)
+   else  if (timerTicks >= arpeggioSpeed && noteActiveC == 1 && controlValue5 >= 1)
   {
         timerTicks = 0;
         setPinHigh(__LEDPORT__, __LED__);
         if (controlValue7 <= 64) {arpMod = 1;} else {arpMod = 0;}
-        int index = (noteC + octaveOffset) + currentPattern[arpeggioCounter];
-        if (index >= 0 && index < sizeof(tp) / sizeof(tp[0])) {
-            periodC = tp[index];
-        } else {
-            periodC = 0;  // Set a default or safe period if index is out of bounds
-        }
+        periodC = tp[(noteC + octaveOffset) + currentPattern[arpeggioCounter]];
+        currentArpNote = (noteC + octaveOffset) + currentPattern[arpeggioCounter] ;
         byte LSB = ( periodC & 0x00FF);
         byte MSB = ((periodC >> 8) & 0x000F);
         send_data(0x04, LSB);
@@ -542,7 +517,8 @@ if (controlNumber == 3) {
     controlValue5 = controlValue; }
 if (controlNumber == 6) { 
     switch (controlValue) {
-        delay(5);
+      timerTicks = 0;
+        delay(15);
         case 0 ... 7:
             currentPattern = pattern1; // Pattern 1
             arpeggioLength = sizeof(pattern1);
