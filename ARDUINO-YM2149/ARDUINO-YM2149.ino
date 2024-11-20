@@ -21,12 +21,24 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <MIDI.h>
 //#include <Arduino.h>
 
 void playNote(byte note, byte velocity, byte channel, int detune);
 void playNoteB(byte note, byte velocity, byte channel, int detune);
 void stopNote();
 void stopNoteB();
+void resetYM();
+void send_data(unsigned char address, unsigned char data);
+void playNote(byte note, byte velo, byte chan, int pitchBendValue);
+void stopNoteB(byte note, byte midiChannel);
+void stopNote(byte note, byte midiChannel);
+void setVolume(uint8_t channel, uint8_t volume, int8_t offset);
+void setMixer(bool toneA, bool noiseA, bool toneB, bool noiseB, bool toneC, bool noiseC);
+void setEnvelope(uint16_t envFreq, uint8_t envShape);
+void updateEnvelope();
+void handleControlChange(byte midiChannel, byte controlNumber, byte controlValue);
+void handlePitchBend(byte midiChannel, int pitchBend);
 
 //Port settings
 const int ad0 = 8;
@@ -45,6 +57,7 @@ const int pinYMReset = 12;
 // Buttons on Analogue Pin A1
 #define buttonPin A1 // analog input pin to use as a digital input
 
+MIDI_CREATE_DEFAULT_INSTANCE();
 //banks
 bool setBankB;
   
@@ -214,9 +227,6 @@ bool toggleVibrato = true;
 ISR(TIMER1_COMPA_vect)
 {
   timerTicks++;
-  if (sampleCounter < sampleLength) {
-    send_data(0x0A, pgm_read_byte_near(sampleOffset + sampleCounter++));
-  }
 
   if (controlValue2 == 0) {
     vibratoCounter = 0;
@@ -338,122 +348,94 @@ ISR(TIMER2_COMPA_vect) {
 
 bool setupOCR1A = false;
 
-void setup(){
-  //init pins
-  pinMode(ad0, OUTPUT);
-  pinMode(ad1, OUTPUT);
-  pinMode(ad2, OUTPUT);
-  pinMode(ad3, OUTPUT);
-  pinMode(ad4, OUTPUT);
-  pinMode(ad5, OUTPUT);
-  pinMode(ad6, OUTPUT);
-  pinMode(ad7, OUTPUT);
-  pinMode(pinBC1, OUTPUT);
-  pinMode(pinBDIR, OUTPUT);
-  pinMode(pinYMReset, OUTPUT);
-  pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT);
-  
-  resetYM();
+void setup() {
+    // Initialize pins
+    pinMode(ad0, OUTPUT);
+    pinMode(ad1, OUTPUT);
+    pinMode(ad2, OUTPUT);
+    pinMode(ad3, OUTPUT);
+    pinMode(ad4, OUTPUT);
+    pinMode(ad5, OUTPUT);
+    pinMode(ad6, OUTPUT);
+    pinMode(ad7, OUTPUT);
+    pinMode(pinBC1, OUTPUT);
+    pinMode(pinBDIR, OUTPUT);
+    pinMode(pinYMReset, OUTPUT);
+    pinMode(ledPin, OUTPUT);
+    pinMode(buttonPin, INPUT);
 
-  //serial init
-  Serial.begin(31250);
-  
-  //timer1 : Arp and vibrato
-  cli();
-  TCCR1A = 0;
-  TCCR1B = 0; 
-  OCR1A = 1250;
-  TCCR1B |= (1 << WGM12); 
-  TCCR1B |= (1 << CS12);  
-  TCCR1B |= (1 << CS10);  
-  TIMSK1 |= (1 << OCIE1A); 
-  //timer2 : sample timer 
-  TCCR2A = 0;
-  TCCR2B = 0; 
-  TCCR2A |= (1 << WGM21); 
-  OCR2A = 1450; 
-  TIMSK2 |= (1 << OCIE2A);
-  TCCR2B |= (1 << CS21); 
-  sei();
+    resetYM();
 
-// HELLO!
-playNote(78, 127, 1, 0);  // F#5
-delay(30);   
-playNote(76, 127, 1, 0);  // E5
-delay(30);
-playNote(74, 127, 1, 0);  // D5
-delay(30);
-playNote(72, 127, 1, 0);  // C5
-delay(30);
-playNote(70, 127, 1, 0);  // B4
-delay(30);
-playNote(69, 127, 1, 0);  // A4
-delay(30);
-playNote(67, 127, 1, 0);  // G4
-delay(30);
-playNote(65, 127, 1, 0);  // F4
-delay(30);
-playNote(64, 127, 1, 0);  // E4
-delay(30);
-playNote(62, 127, 1, 0);  // D4
-delay(30);
-stopNote(62, 1);       // Stop D4       // Stop D4
-}//END OF SETUP
+    // Initialize MIDI
+    MIDI.begin(MIDI_CHANNEL_OMNI);
+    MIDI.setHandleNoteOn(handleNoteOn);
+    MIDI.setHandleNoteOff(handleNoteOff);
+    MIDI.setHandleControlChange(handleControlChange);
+    MIDI.setHandlePitchBend(handlePitchBend);
 
-// Main Loop
+    // Initialize timers
+    cli();
+    TCCR1A = 0;
+    TCCR1B = 0; 
+    OCR1A = 1250;
+    TCCR1B |= (1 << WGM12); 
+    TCCR1B |= (1 << CS12);  
+    TCCR1B |= (1 << CS10);  
+    TIMSK1 |= (1 << OCIE1A); 
+
+    TCCR2A = 0;
+    TCCR2B = 0; 
+    TCCR2A |= (1 << WGM21); 
+    OCR2A = 1450; 
+    TIMSK2 |= (1 << OCIE2A);
+    TCCR2B |= (1 << CS21); 
+    sei();
+
+    // HELLO!
+    playNote(78, 127, 1, 0); delay(30);
+    playNote(76, 127, 1, 0); delay(30);
+    playNote(74, 127, 1, 0); delay(30);
+    playNote(72, 127, 1, 0); delay(30);
+    playNote(70, 127, 1, 0); delay(30);
+    playNote(69, 127, 1, 0); delay(30);
+    playNote(67, 127, 1, 0); delay(30);
+    playNote(65, 127, 1, 0); delay(30);
+    playNote(64, 127, 1, 0); delay(30);
+    playNote(62, 127, 1, 0); delay(30);
+    stopNote(62, 1);
+}
+
 void loop() {
-  byte command = getSerialByte();
-  byte commandMSB = command & 0xF0;
-  byte midiChannel = command & 0x0F;
+    if (Serial.available() >= 3) {  // Wait for a full MIDI message
+        byte status = Serial.read();
+        byte data1 = Serial.read();
+        byte data2 = Serial.read();
 
-  switch (commandMSB) {
-    case 0x80: { // Note Off
-      byte note = getSerialByte();
-      if (setBankB) stopNoteB(note, midiChannel);
-      else stopNote(note, midiChannel);
-      break;
-    }
-    
-    case 0x90: { // Note On
-      byte note = getSerialByte();
-      byte velo = getSerialByte();
-      setupOCR1AOnce();
-      velo = constrainVelocity(velo);
-      velocityValue = velo;
-
-      if (midiChannel == 0x09 && velo != 0) {
-        playDigidrum(note, velo);
-      } else if (velo != 0) {
-        if (setBankB) {
-          playNoteB(note, velo, midiChannel, pitchBendValue);
-          //applyNoteLengthDelay(stopNoteB, note, midiChannel);
-        } else {
-          playNote(note, velo, midiChannel, pitchBendValue);
-          //applyNoteLengthDelay(stopNote, note, midiChannel);
+        if ((status & 0xF0) == 0x90 && data2 > 0) {  // Note On
+            handleNoteOn(status & 0x0F, data1, data2);
+        } else if ((status & 0xF0) == 0x90 || (status & 0xF0) == 0x80) {  // Note Off
+            handleNoteOff(status & 0x0F, data1, data2);
         }
-      } else {
+    }
+}
+
+void handleNoteOn(byte midiChannel, byte note, byte velocity) {
+    setupOCR1AOnce();
+    velocityValue = constrainVelocity(velocity);
+    if (midiChannel == 9 && velocity != 0) {
+        playDigidrum(note, velocityValue);
+    } else if (velocity != 0) {
+        if (setBankB) playNoteB(note, velocityValue, midiChannel, pitchBendValue);
+        else playNote(note, velocityValue, midiChannel, pitchBendValue);
+    } else {
         if (setBankB) stopNoteB(note, midiChannel);
         else stopNote(note, midiChannel);
-      }
-      break;
     }
+}
 
-    case 0xA0: // Key Pressure
-    case 0xC0: // Program Change
-    case 0xD0: // Channel Pressure
-      getSerialByte(); // Ignore the extra bytes for these commands
-      getSerialByte();
-      break;
-
-    case 0xB0: // Control Change
-      handleControlChange(midiChannel);
-      break;
-
-    case 0xE0: // Pitch Bend
-      handlePitchBend(midiChannel);
-      break;
-  }
+void handleNoteOff(byte midiChannel, byte note, byte velocity) {
+    if (setBankB) stopNoteB(note, midiChannel);
+    else stopNote(note, midiChannel);
 }
 
 void setupOCR1AOnce() {
@@ -475,36 +457,20 @@ byte constrainVelocity(byte velo) {
     }
 }
 
-void handleControlChange(byte midiChannel) {
-  byte controlNumber = getSerialByte();
-  byte controlValue = getSerialByte();
-
-  switch (controlNumber) {
-    case 1: // Detune
-      controlValue1 = controlValue;
-      detuneValue = map(controlValue1, 0, 127, -256, 252) / 4;
-      applyDetuneToActiveNotes(midiChannel);
-      break;
-    case 2: controlValue2 = controlValue; vibratoRate = map(controlValue2, 1, 127, 1, 10); break;
-    case 3: controlValue3 = controlValue; vibratoDepth = map(controlValue3, 1, 127, 0, 12); break;
-    case 4: controlValue4 = controlValue; break;
-    case 5: controlValue5 = controlValue; break;
-    case 6: handlePatternChange(controlValue); break;
-    case 7: controlValue7 = controlValue; break;
-    case 8: handleOctaveOffset(controlValue); break;
-    case 9: setBankB = (controlValue > 64); break;
-    case 10: controlValue10 = controlValue; break;
-
-    // New cases for envelope frequency and shape
-    case 11: 
-      controlValue11 = controlValue; 
-      updateEnvelope(); 
-      break;
-    case 12: 
-      controlValue12 = controlValue; 
-      updateEnvelope(); 
-      break;
-  }
+void handleControlChange(byte midiChannel, byte controlNumber, byte controlValue) {
+    switch (controlNumber) {
+        case 1: // Detune
+            controlValue1 = controlValue;
+            detuneValue = map(controlValue1, 0, 127, -256, 252) / 4;
+            applyDetuneToActiveNotes(midiChannel);
+            break;
+        case 2: controlValue2 = controlValue; vibratoRate = map(controlValue2, 1, 127, 1, 10); break;
+        case 3: controlValue3 = controlValue; vibratoDepth = map(controlValue3, 1, 127, 0, 12); break;
+        case 4: controlValue4 = controlValue; break;
+        case 10: controlValue10 = controlValue; break;
+        case 11: controlValue11 = controlValue; updateEnvelope(); break;
+        case 12: controlValue12 = controlValue; updateEnvelope(); break;
+    }
 }
 
 void handlePatternChange(byte controlValue) {
@@ -526,16 +492,10 @@ void handleOctaveOffset(byte controlValue) {
   else octaveOffset = 36;
 }
 
-void handlePitchBend(byte midiChannel) {
-  setPinHigh(__LEDPORT__, __LED__);
-  byte pitchBendLSB = getSerialByte();
-  byte pitchBendMSB = getSerialByte();
-  pitchBendValue = -(((pitchBendMSB << 7) | pitchBendLSB) - 8192);
-  if (noteActiveA) (setBankB ? playNoteB : playNote)(noteA, velocityValue, midiChannel, pitchBendValue);
-  if (noteActiveB) (setBankB ? playNoteB : playNote)(noteB, velocityValue, midiChannel, pitchBendValue);
-  if (noteActiveC) (setBankB ? playNoteB : playNote)(noteC, velocityValue, midiChannel, pitchBendValue);
-  
-  CLEAR(__LEDPORT__, __LED__);
+void handlePitchBend(byte midiChannel, int bendValue) {
+    pitchBendValue = bendValue;
+    if (setBankB) playNoteB(noteA, velocityValue, midiChannel, pitchBendValue);
+    else playNote(noteA, velocityValue, midiChannel, pitchBendValue);
 }
 
 void applyDetuneToActiveNotes(byte midiChannel) {
