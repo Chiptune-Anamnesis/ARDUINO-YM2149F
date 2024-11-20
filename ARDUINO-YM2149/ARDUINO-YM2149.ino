@@ -545,8 +545,8 @@ void applyDetuneToActiveNotes(byte midiChannel) {
 
   for (int i = 0; i < 3; i++) {
     if (noteActives[i] && detuneActives[i]) {
-      if (setBankB) playNoteB(notes[i], velocityValue, midiChannel, pitchBendValue);
-      else playNote(notes[i], velocityValue, midiChannel, pitchBendValue);
+      //if (setBankB) playNoteB(notes[i], velocityValue, midiChannel, pitchBendValue);
+      //else playNote(notes[i], velocityValue, midiChannel, pitchBendValue);
     }
   }
 }
