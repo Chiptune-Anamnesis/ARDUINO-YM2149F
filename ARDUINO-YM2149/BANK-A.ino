@@ -441,7 +441,7 @@ chan = chan + 1;
         send_data(0x04, 0);
         send_data(0x05, 0); 
         setVolume(2, 0, 0); 
-        //setEnvelope(0x0000, 0x00);
+        setEnvelope(0x0000, 0x00);
         sei();
     }
 // MIDI Channel 4
