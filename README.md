@@ -14,10 +14,6 @@ This project re-designs the hardware and software of the YM2149F for Arduino, in
 - Simplifies the process for converting and adding new samples.
 - Backwards compatibility with Dansfing 2.1a minus the display board.
 - Functional orientation will be horizontal.
-- 3D printed bottom shell (will be open source when it is done).
-- Open source board gerber (coming soon).
-- Parts list (coming soon).
-- All chips should be socketed for easy replacement.
 
 PCB Layout:
 
@@ -51,7 +47,7 @@ Registers: The YM2149F is controlled through a set of registers. Different regis
 Clock Frequency: The chip typically operates at a clock frequency around 2 MHz, which is then divided internally to produce sound frequencies.
 Control Interface: It uses a simple data and address bus interface, making it relatively easy to integrate with microprocessors for real-time sound control.
 
-## Installation
+## Installationfg
 
 **ARDUINO-YM2149.ino, BANK-A.ino, BANK-B.ino** - for the hardware:
 
