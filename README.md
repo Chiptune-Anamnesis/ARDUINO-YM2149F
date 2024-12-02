@@ -168,17 +168,17 @@ Use CC9 to switch from Bank A to B
 - CH. 1: Voices 1 **Voices(A)** **Default Voice**.
 - CH. 2: Voices 1 **Voices(B)** **Default Voice**. 
 - CH. 3: Voices 1 **Voices(C)** **Default Voice**. 
-- CH. 4: Voices 3 **Voices(A, B and C)** **Gritty / Modulated**.
-- CH. 5: Voices 3 **Voices(A, B and C)** **Gritty / Modulated**. 
-- CH. 6: Voices 1 **Voices(A)** **Gritty / Horn-Like / Modulated**. 
-- CH. 7: Voices 2 **Voices(A and C)** **Gritty / Very Bassy**. 
-- CH. 8: Voices 2 **Voices(A and B)**  **Gritty / Modulated / Great Bass**. 
-- CH. 9: Voices 2 **Voices(A and B)**  **Gritty / Great Bass**. 
+- CH. 4: Voices 3 **Voices(A, B and C)**
+- CH. 5: Voices 3 **Voices(A, B and C)**
+- CH. 6: Voices 1 **Voices(A)** 
+- CH. 7: Voices 2 **Voices(A and C)** 
+- CH. 8: Voices 2 **Voices(A and B)**
+- CH. 9: Voices 2 **Voices(A and B)** 
 - CH. 10: Drum Samples *See Note to Sample Map. Play concurrently with any preset.
-- CH. 11: Voices 1 **Voices(A)** **Small Voice / Modem Tones**. 
-- CH. 12: Voices 3 **Voices(A, B and C)**  **Gritty / Great Bass / Modulation**. 
-- CH. 13: Voices 3 **Voices(A, B and C)**  **Heavy Modulation**. 
-- CH. 14: Voices 3 **Voices(A, B and C)** **Gritty / Modulated**. 
+- CH. 11: Voices 1 **Voices(A)**
+- CH. 12: Voices 3 **Voices(A, B and C)**
+- CH. 13: Voices 3 **Voices(A, B and C)**
+- CH. 14: Voices 3 **Voices(A, B and C)**  
 - CH. 15: Empty
 - CH. 16: Empty
 
