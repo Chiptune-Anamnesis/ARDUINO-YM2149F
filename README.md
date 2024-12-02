@@ -15,6 +15,8 @@ This project re-designs the hardware and software of the YM2149F for Arduino, in
 - Backwards compatibility with Dansfing 2.1a minus the display board.
 - Functional orientation will be horizontal.
 
+Demo: https://youtu.be/DTTnOLZ_Pxs?si=BOz4uIH5FwQmd9xw
+
 PCB Layout:
 
 ![Board Layout](ym2149f-board-layout.png)
