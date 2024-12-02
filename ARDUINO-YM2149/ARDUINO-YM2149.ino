@@ -93,7 +93,7 @@ byte defaultLevel = 10;
 
 //pitch bend
 int pitchBendValue = 0;
-float pitchBendRange = 32768.0; // multiple of 8192.0, the smaller the more the bend range.
+float pitchBendRange = 8192.0; // multiple of 8192.0, the smaller the more the bend range.
 
 //volume
 byte defaultVolume = 0x0F;
