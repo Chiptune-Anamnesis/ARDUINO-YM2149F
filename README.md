@@ -48,7 +48,7 @@ Registers: The YM2149F is controlled through a set of registers. Different regis
 Clock Frequency: The chip typically operates at a clock frequency around 2 MHz, which is then divided internally to produce sound frequencies.
 Control Interface: It uses a simple data and address bus interface, making it relatively easy to integrate with microprocessors for real-time sound control.
 
-## Installationfg
+## Installation
 
 **ARDUINO-YM2149.ino, BANK-A.ino, BANK-B.ino** - for the hardware:
 
