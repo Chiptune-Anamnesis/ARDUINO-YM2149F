@@ -1,7 +1,6 @@
 ![Project Logo](ym2149f-logo.png)
 
 ## Project Details
-
 This project re-designs the hardware and software of the YM2149F for Arduino, inspired by Dansfing’s 2.1a version, which is driven by an ATMEGA328P chip and includes a CH430e TTL for USB programming. The original code was initially developed by Yukimizake, whose work inspired Dansfing. This version introduces several key changes:
 
 - Relocates all user interface elements and inputs/outputs to the front of the board.
@@ -86,7 +85,7 @@ The code includes detailed comments to help you create custom presets. Code rela
 
 - **Velocity**: Velocity sensitivity is implemented for MIDI Channels 1-4. (Use the example to add it to other channels as needed.)
 
-- **Arpeggiation** - Arpeggiation with rate, octave shift and 16 unique patterns.
+- **Arpeggiation** - Arpeggiation with rate, octave shift, and 16 unique patterns.
 
 - **Vibrato** - Vibrato rate and depth. (kinda wonky at the moment)
 
