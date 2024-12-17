@@ -6,11 +6,10 @@ This project re-designs the hardware and software of the YM2149F for Arduino, in
 - Relocates all user interface elements and inputs/outputs to the front of the board.
 - Signifigant re-writing of the code.
 - Signifigant options added for voice sound design and effects.
-- Completely CC controlled CC1-12.
-- Replaces the DIN5 connector with only 3.5mm TRS to conserve space.
+- Completely MIDI CC controlled CC1-12.
 - Adds more default sound presets.
-- Switch between preset banks with CC-8 ( 1-64 selects Bank A, 64-127 is Bank B )
-- Simplifies the process for converting and adding new samples.
+- 2 preset banks for 28 total possible, switch between preset banks with CC-8 ( 1-64 selects Bank A, 64-127 is Bank B )
+- Simplifies the process for converting and adding new samples witha  python script.
 - Backwards compatibility with Dansfing 2.1a minus the display board.
 - Functional orientation will be horizontal.
 
