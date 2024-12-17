@@ -5,6 +5,7 @@ This project re-designs the hardware and software of the YM2149F for Arduino, in
 
 - Relocates all user interface elements and inputs/outputs to the front of the board.
 - Signifigant re-writing of the code.
+- Signifigant options added for voice sound design and effects.
 - Completely CC controlled CC1-12.
 - Replaces the DIN5 connector with only 3.5mm TRS to conserve space.
 - Adds more default sound presets.
