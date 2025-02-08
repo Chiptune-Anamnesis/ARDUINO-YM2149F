@@ -683,37 +683,23 @@ void resetYM()
     }
 }
 
-void send_data(unsigned char address, unsigned char data) {
-    boolean value[8];
-    for (int i = 0; i < 8; i++) {
-        value[i] = ((address & 0x01) == 1);
-        address >>= 1;
-    }
-    outputToYM(value);
-    __BCPORT__ |= (1 << __BDIR__) | (1 << __BC1__);
-    delayMicroseconds(1);
-    __BCPORT__ &= ~((1 << __BDIR__) | (1 << __BC1__));
-    for (int i = 0; i < 8; i++) {
-        value[i] = ((data & 0x01) == 1);
-        data >>= 1;
-    }
-    outputToYM(value);
-    setPinHigh(__BCPORT__, __BDIR__);
-    delayMicroseconds(1);
-    setPinLow(__BCPORT__, __BDIR__);
-    setPinLow(__LEDPORT__, __LED__);
+void send_data(uint8_t address, uint8_t data) {
+    outputToYM(address); // Send address first
+    __BCPORT__ |= (1 << __BDIR__) | (1 << __BC1__); // Latch address
+    delayMicroseconds(10); // Allow register time to settle
+    __BCPORT__ &= ~((1 << __BDIR__) | (1 << __BC1__)); // Release bus
+
+    outputToYM(data); // Send data
+    __BCPORT__ |= (1 << __BDIR__); // Latch data
+    delayMicroseconds(10); // Allow YM2149F time to process
+    __BCPORT__ &= ~(1 << __BDIR__); // Release bus
+
+    __LEDPORT__ &= ~(1 << __LED__); // Turn off LED (if used for debugging)
 }
 
-void outputToYM(boolean value[])
-{
-  setPinState(PORTB, 0, value[0]);
-  setPinState(PORTB, 1, value[1]);
-  setPinState(PORTD, 2, value[2]);
-  setPinState(PORTD, 3, value[3]);
-  setPinState(PORTD, 4, value[4]);
-  setPinState(PORTD, 5, value[5]);
-  setPinState(PORTD, 6, value[6]);
-  setPinState(PORTD, 7, value[7]);
+void outputToYM(uint8_t value) {
+    PORTB = (PORTB & 0xFC) | (value & 0x03); // Update PB0-PB1 (lower 2 bits)
+    PORTD = (value & 0xFC); // Update PD2-PD7 (upper 6 bits)
 }
 
 void setPinState(volatile uint8_t &port, uint8_t pin, bool state)
