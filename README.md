@@ -61,10 +61,10 @@ Control Interface: It uses a simple data and address bus interface, making it re
 4. Flip switch (PGM/MIDI) back to MIDI.
 
 
-**ym2149-wave.py** - creating your own samples:
+**wav-to-ym2149f-converter.py** - creating your own samples:
 
-1. Prepare a short WAV sample using a program like Audacity.
-2. Modify the 'path to .wav' in the script to point to the location of your .wav file.
+1. Prepare a folde rof .wav samples.
+2. Modify the path variables in the script.
 3. Run the Python script and copy the output.
 
 The script will generate 'PROGMEM const char' values and 'const int' length values for YM2149 code samples. You can paste these over existing values or create new ones. Keep in mind that samples must be short due to limited space.
@@ -204,6 +204,9 @@ E3-64/PROGMEM const char s0[]: Kick Drum
 This is a seperate version of code that is geared towards sampling. It supports pitch bend and low pass filtering (cc1).
 Each subfolder under the samples folder has it's own built in samples in the code.
 You can add your own samples (preferrably very low bitrate), using the included Python scripts.
+
+sf2-to-wav-converter.py will convert a soundfont file to .wav files
+wav-to-ym2149f-converter.py will convert a folder of .wav files to code you can transplant into the samples code.
 
 ## Contacts and Resources
 
