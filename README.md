@@ -199,6 +199,12 @@ D#3/63/PROGMEM const char s1[]: Snare
 
 E3-64/PROGMEM const char s0[]: Kick Drum
 
+### *Sampler Code (Samples Folder .ino)
+
+This is a seperate version of code that is geared towards sampling. It supports pitch bend and low pass filtering (cc1).
+Each subfolder under the samples folder has it's own built in samples in the code.
+You can add your own samples (preferrably very low bitrate), using the included Python scripts.
+
 ## Contacts and Resources
 
 Discord: https://discord.gg/32wfnbkCtE
